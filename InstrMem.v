@@ -8,7 +8,7 @@ module Instruction_Memory(rst, A, RD);
     assign RD = (rst == 1'b0) ? 32'h00000000 : memory[A[31:2]];
 
     initial begin
-        $readmemh("test.txt", memory);
+        $readmemh("memfile.hex", memory);
     end
 endmodule
 
