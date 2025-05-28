@@ -1,6 +1,6 @@
-`include "RAM.v"
 
-module memwrt_stage (clk, rst, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplus4Mem, WriteDataMem, ALU_ResultMem);
+
+module memwrt_stage (clk, rst, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplus4Mem, WriteDataMem, ALU_ResultMem, RegWriteW, ResultSrcW, RD_W, PCPlus4W, ALU_ResultW, ReadDataW);
     
     input clk, rst, RegWrtMem, MemWrtMem, ResultSrcMem;
     input [4:0] RD_Mem; 
@@ -23,13 +23,13 @@ module memwrt_stage (clk, rst, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplu
 
     // RAM Module
 
-    RAM RAM (
-        .clk(clk),
-        .rst(rst),
-        .WE(MemWrtMem),
-        .A(ALU_ResultMem),
-        .WD(WriteDataMem),
-        .RD(ReadDataMem)
+    DataMem data_memory (
+                        .clk(clk),
+                        .rst(rst),
+                        .WE(MemWrtMem),
+                        .WD(WriteDataMem),
+                        .A(ALU_ResultMem),
+                        .RD(ReadDataMem)
     );
 
     //Register Logic
@@ -60,5 +60,4 @@ module memwrt_stage (clk, rst, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplu
     assign PCPlus4W = PCplus4Mem_r;
     assign ALU_ResultW = ALU_ResultMem_r;
     assign ReadDataW = ReadDataMem_r;
-
 endmodule

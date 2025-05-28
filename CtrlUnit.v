@@ -1,5 +1,5 @@
 `include "ALU_Decoder.v"
-`include "Decoder.v"
+`include "Main_Decoder.v"
 
 module Ctrl_Unit (Op, RegWrt, ImmSrc, ALUSrc, MemWrt, ResultSrc, Branch, funct3, funct7, ALUControl);
 
@@ -11,7 +11,7 @@ module Ctrl_Unit (Op, RegWrt, ImmSrc, ALUSrc, MemWrt, ResultSrc, Branch, funct3,
 
     wire [1:0] ALUOp;
 
-    decoder Main_Decoder(
+    Main_Decoder Main_Decoder(
                 .Op(Op),
                 .RegWrt(RegWrt),
                 .ImmSrc(ImmSrc),
@@ -22,11 +22,12 @@ module Ctrl_Unit (Op, RegWrt, ImmSrc, ALUSrc, MemWrt, ResultSrc, Branch, funct3,
                 .ALUOp(ALUOp)
     );
 
-    ALU_Decoder ALU_Decoder(
+    ALU_decoder alu_decoder(
                             .ALUOp(ALUOp),
                             .funct3(funct3),
                             .funct7(funct7),
                             .op(Op),
                             .ALUControl(ALUControl)
     );
+    
 endmodule

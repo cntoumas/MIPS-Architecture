@@ -1,12 +1,8 @@
-`include "CtrlUnit.v"
-`include "RegFile.v"
-`include "SignExtend.v"
+
+module decode_stage (clk, rst, InstrDe, PCDe, PCplus4De, RegWriteW, RDW, ResultW, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, BranchEx, ALUControlEx, RD1Ex, RD2Ex, Imm_ExtEx, RDEx, PCEx, PCplus4Ex, RS1Ex, RS2Ex);
 
 
-module decode_stage (clk, rst, InstrDe, PCDe, PCplus4De, RegWrtW, RDW, ResultW, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, BranchEx, ALUControlEx, RD1Ex, RD2Ex, Imm_ExtEx, RDEx, PCEx, PCplus4Ex, RS1Ex, RS2Ex);
-
-
-    input clk, rst, RegWrtW;
+    input clk, rst, RegWriteW;
     input [4:0] RDW;
     input [31:0] InstrDe, PCDe, PCplus4De, ResultW;
 
@@ -51,7 +47,7 @@ module decode_stage (clk, rst, InstrDe, PCDe, PCplus4De, RegWrtW, RDW, ResultW, 
     Register_File rf (
         .clk(clk),
         .rst(rst),
-        .WEx3(RegWrtW),
+        .WEx3(RegWriteW),
         .WDe3(ResultW),
         .A1(InstrDe[19:15]),
         .A2(InstrDe[24:20]),
@@ -81,12 +77,13 @@ module decode_stage (clk, rst, InstrDe, PCDe, PCplus4De, RegWrtW, RDW, ResultW, 
             RD1De_r <= 32'h00000000;
             RD2De_r <= 32'h00000000;
             Imm_ExtDe_r <= 32'h00000000;
-            RDDe_r <= 5'b00000;
-            RS1De_r <= 5'b00000;
-            RS2De_r <= 5'b00000;
+            RDDe_r <= 5'h00;
             PCDe_r <= 32'h00000000;
             PCplus4De_r <= 32'h00000000;
-        end else begin
+            RS1De_r <= 5'h00;
+            RS2De_r <= 5'h00;
+        end 
+        else begin
             RegWrtDe_r <= RegWrtDe;
             ALUSrcDe_r <= ALUSrcDe;
             MemWrtDe_r <= MemWrtDe;

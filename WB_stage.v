@@ -1,4 +1,3 @@
-`include "Mux.v"
 
 module writeback_stage (clk, rst, ResultSrcW, PCPlus4W, ALU_ResultW, ReadDataW, ResultW);
 
@@ -9,11 +8,11 @@ module writeback_stage (clk, rst, ResultSrcW, PCPlus4W, ALU_ResultW, ReadDataW, 
 
  //--------Modules------//
 
-     MUX final_mux (
+     Mux final_mux (
         .a(ALU_ResultW),
         .b(ReadDataW),
         .sel(ResultSrcW),
         .c(ResultW)
       );  
-
+      
 endmodule

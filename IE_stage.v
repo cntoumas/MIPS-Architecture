@@ -1,8 +1,5 @@
-`include "ALU.v"
-`include "MUX.v"
-`include "PC_add.v"
 
-module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, BranchEx, ALUControlEx, RD1Ex, RD2Ex, Imm_ExtEx, RDEx, PCEx, PCplus4Ex, PCSrcEx, PCTargetEx, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplus4Mem, WriteDataMem, ALU_ResultMem, ResultW, ForwardAEx, ForwardBEx);
+module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, BranchEx, ALUControlEx, RD1Ex, RD2Ex, Imm_ExtEx, RDEx, PCEx, PCplus4Ex, ResultW, ForwardA_Ex, ForwardB_Ex, PCSrcEx, RegWrtMem, MemWrtMem, ResultSrcMem, RD_Mem, PCplus4Mem, WriteDataMem, ALU_ResultMem, PCTargetEx);
   
     // Declaration I/Os
     input clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, BranchEx;
@@ -11,7 +8,7 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
     input [4:0] RDEx;
     input [31:0] PCEx, PCplus4Ex;
     input [31:0] ResultW;
-    input [1:0] ForwardAEx, ForwardBEx;
+    input [1:0] ForwardA_Ex, ForwardB_Ex;
 
     output PCSrcEx, RegWrtMem, MemWrtMem, ResultSrcMem;
     output [4:0] RD_Mem; 
@@ -30,27 +27,26 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
 
     //------Modules------//
 
-    // Mux for A
+    // Muxes for Forwarding
     Mux_3_by_1 srca_mux (
                         .a(RD1Ex),
                         .b(ResultW),
                         .c(ALU_ResultMem),
-                        .sel(ForwardAEx),
+                        .sel(ForwardA_Ex),
                         .d(Src_A)
                         );
-
-    // Mux for B
+    
     Mux_3_by_1 srcb_mux (
                         .a(RD2Ex),
                         .b(ResultW),
                         .c(ALU_ResultMem),
-                        .sel(ForwardBEx),
+                        .sel(ForwardB_Ex),
                         .d(Src_B_interim)
                         );
-    
-    // ALU Src Mux
-    MUX alu_src_mux (
-            .a(RD2Ex),
+
+    // MUX for ALU 
+    Mux alu_src_mux (
+            .a(Src_B_interim),
             .b(Imm_ExtEx),
             .sel(ALUSrcEx),
             .c(Src_B)
@@ -62,7 +58,10 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
             .B(Src_B),
             .Result(ResultEx),
             .ALUControl(ALUControlEx),
-            .Zero(ZeroEx)
+            .OverFlow(),
+            .Carry(),
+            .Zero(ZeroEx),
+            .Negative()
             );
 
     // Adder
@@ -78,7 +77,7 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
             RegWrtEx_r <= 1'b0;
             MemWrtEx_r <= 1'b0;
             ResultSrcEx_r <= 1'b0;
-            RDEx_r <= 5'h0000000;
+            RDEx_r <= 5'h00;
             PCplus4Ex_r <= 32'h00000000;
             RD2Ex_r <= 32'h00000000;
             ResultEx_r <= 32'h00000000;
@@ -89,7 +88,7 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
             ResultSrcEx_r <= ResultSrcEx;
             RDEx_r <= RDEx;
             PCplus4Ex_r <= PCplus4Ex;
-            RD2Ex_r <= RD2Ex;
+            RD2Ex_r <= Src_B_interim;
             ResultEx_r <= ResultEx;
         end
     end
@@ -97,12 +96,12 @@ module execute_stage (clk, rst, RegWrtEx, ALUSrcEx, MemWrtEx, ResultSrcEx, Branc
     // Output Logic
 
     assign PCSrcEx = ZeroEx & BranchEx;
-    assign RegWrtMem = RegWrtEx;
-    assign MemWrtMem = MemWrtEx;
-    assign ResultSrcMem = ResultSrcEx;
-    assign RD_Mem = RDEx;
-    assign PCplus4Mem = PCplus4Ex;
-    assign WriteDataMem = RD2Ex;
-    assign ALU_ResultMem = ResultEx;
+    assign RegWrtMem = RegWrtEx_r;
+    assign MemWrtMem = MemWrtEx_r;
+    assign ResultSrcMem = ResultSrcEx_r;
+    assign RD_Mem = RDEx_r;
+    assign PCplus4Mem = PCplus4Ex_r;
+    assign WriteDataMem = RD2Ex_r;
+    assign ALU_ResultMem = ResultEx_r;
     
 endmodule
